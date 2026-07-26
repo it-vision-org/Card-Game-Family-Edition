@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: between-three-api
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/between_three_us}
+    username: ${DATABASE_USERNAME:game_user}
+    password: ${DATABASE_PASSWORD:game_password}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    validate-migration-naming: true
+
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  security:
+    access-token-expiration: PT15M
+    refresh-token-expiration: P30D
+    access-token-secret: ${JWT_ACCESS_SECRET:local-access-secret-change-me}
+    refresh-token-secret: ${JWT_REFRESH_SECRET:local-refresh-secret-change-me}
+
+logging:
+  level:
+    root: INFO
+    tn.itvision.betweenthree: DEBUG

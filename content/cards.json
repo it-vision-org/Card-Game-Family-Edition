@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "cards": [
+    {
+      "externalKey": "MEMORY_FIRST_IMPRESSION_001",
+      "type": "QUESTION",
+      "categoryCode": "MEMORIES_AND_STORIES",
+      "best": true,
+      "active": true,
+      "skippable": true,
+      "supportsScoring": false,
+      "sensitivityLevel": 1,
+      "emotionalDepth": 2,
+      "minimumPlayers": 3,
+      "maximumPlayers": null,
+      "selectionWeight": 100,
+      "targeting": {
+        "type": "RELATIONSHIP_PAIR",
+        "relationshipTypes": [
+          "PARTNER_PARENT"
+        ]
+      },
+      "requirements": {
+        "timerSeconds": null,
+        "textInput": false,
+        "photo": false
+      },
+      "translations": {
+        "ar-TN": {
+          "title": null,
+          "text": "شنوّة كان أول انطباع ماما على أحمد؟",
+          "instructions": null
+        },
+        "en": {
+          "title": null,
+          "text": "What was the first impression between these two players?",
+          "instructions": null
+        },
+        "fr": {
+          "title": null,
+          "text": "Quelle était la première impression entre ces deux joueurs ?",
+          "instructions": null
+        }
+      }
+    }
+  ]
+}

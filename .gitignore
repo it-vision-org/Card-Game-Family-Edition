@@ -1,0 +1,37 @@
+# Environment variables
+.env
+*.env
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Flutter
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/build/
+mobile/android/.gradle/
+mobile/android/local.properties
+
+# Spring Boot
+backend/build/
+backend/target/
+backend/.gradle/
+
+# Logs
+*.log
+
+# Generated files
+mobile/lib/**/*.g.dart
+mobile/lib/**/*.freezed.dart
+
+# Other files
+projectIdea.txt
+questions, rules and cards.txt
