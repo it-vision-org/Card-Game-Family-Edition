@@ -1,6 +1,6 @@
 # Environment variables
-#.env
-#*.env
+.env
+*.env
 !.env.example
 
 # IDE
@@ -34,6 +34,6 @@ mobile/lib/**/*.freezed.dart
 
 # Other files
 
-#project-idea.txt
-#questions, rules and cards.txt
-#questions-players-relation.txt
+project-idea.txt
+questions, rules and cards.txt
+questions-players-relation.txt

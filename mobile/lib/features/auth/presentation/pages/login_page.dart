@@ -80,7 +80,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   enabled: !isLoading,
                   obscureText: true,
                   keyboardType: TextInputType.number,
-                  maxLength: 6,
+                  maxLength: 10,
                   textAlign: TextAlign.center,
                   decoration: const InputDecoration(
                     labelText: 'الرمز السري',
