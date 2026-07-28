@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "powerCards": [
+    {
+      "code": "POWER_WHISPER",
+      "effectType": "WHISPER",
+      "maxUsesPerSession": 1,
+      "isActive": true,
+      "title": "الهمس",
+      "description": "يجب على الطرف الآخر إجابة السؤال بـ \"همس\" في أذنك فقط."
+    },
+    {
+      "code": "POWER_DECLINE_TO_ANSWER",
+      "effectType": "DECLINE_TO_ANSWER",
+      "maxUsesPerSession": 1,
+      "isActive": true,
+      "title": "أفضّل ألا أجيب",
+      "description": "تسمح لكل لاعب بتجاوز سؤال يشعر أنه غير مستعد للإجابة عنه."
+    },
+    {
+      "code": "POWER_MIRROR",
+      "effectType": "MIRROR",
+      "maxUsesPerSession": 1,
+      "isActive": true,
+      "title": "المرآة",
+      "description": "يجب على الشخصين الآخرين أن يجيبا على السؤال أيضًا."
+    },
+    {
+      "code": "POWER_FULL_STORY",
+      "effectType": "FULL_STORY",
+      "maxUsesPerSession": 1,
+      "isActive": true,
+      "title": "الحكاية كاملة",
+      "description": "تطلب من لاعب ألا يكتفي بإجابة قصيرة، بل يحكي الموقف بالتفصيل."
+    },
+    {
+      "code": "POWER_CHANGE_QUESTION",
+      "effectType": "CHANGE_QUESTION",
+      "maxUsesPerSession": 1,
+      "isActive": true,
+      "title": "بدّل السؤال",
+      "description": "تضع الكارطة جانبًا وتسحب كارطة جديدة."
+    },
+    {
+      "code": "POWER_EVERYONE_ANSWERS",
+      "effectType": "EVERYONE_ANSWERS",
+      "maxUsesPerSession": 1,
+      "isActive": true,
+      "title": "الكل يجاوب",
+      "description": "تحوّل أي سؤال فردي إلى سؤال يجاوب عليه الثلاثة."
+    },
+    {
+      "code": "POWER_WORD_FROM_HEART",
+      "effectType": "WORD_FROM_HEART",
+      "maxUsesPerSession": 1,
+      "isActive": true,
+      "title": "كلمة من القلب",
+      "description": "تختار شخصًا، ويجب عليه أن يقول لك شيئًا جميلًا وصادقًا."
+    },
+    {
+      "code": "POWER_NO_DIPLOMACY",
+      "effectType": "NO_DIPLOMACY",
+      "maxUsesPerSession": 1,
+      "isActive": true,
+      "title": "ممنوع الدبلوماسية",
+      "description": "يجب على صاحب السؤال أن يعطي الإجابة الحقيقية، لا الإجابة التي ترضي الآخرين."
+    }
+  ]
+}

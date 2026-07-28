@@ -1,13 +1,13 @@
 package tn.itvision.betweenthree;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class BetweenThreeApiApplicationTests {
+import tn.itvision.betweenthree.support.IntegrationTestSupport;
 
-	@Test
-	void contextLoads() {
-	}
+class BetweenThreeApiApplicationTests extends IntegrationTestSupport {
+
+    @Test
+    void contextLoads() {
+    }
 
 }

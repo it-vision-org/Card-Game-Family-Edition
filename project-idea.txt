@@ -1,0 +1,609 @@
+# Mobile Card Game — Architecture and Database Design Request
+
+I want to develop a private mobile card game for three family members:
+
+* Ahmed
+* Rahma, Ahmed’s fiancée
+* Mamti, Rahma’s mother
+
+Ahmed and Mamti have a close mother-and-son relationship, even though she is Rahma’s mother.
+
+The working title of the game is **“Between the Three of Us”**.
+
+## Project objective
+
+The purpose of the application is to create enjoyable, emotional, funny, and memorable moments between the three players.
+
+The game is not primarily competitive. It should help the players:
+
+* Learn new things about each other.
+* Remember shared experiences.
+* Have fun and laugh together.
+* Express appreciation and affection.
+* Discuss their future as a family.
+* Strengthen the relationship between Ahmed, Rahma, and Mamti.
+
+## Chosen technologies
+
+I currently plan to use:
+
+* **Flutter** for the mobile application.
+* **Spring Boot** for the backend API.
+
+Please evaluate whether this is an appropriate choice and recommend the complete technology stack required for a secure, maintainable, and scalable application.
+
+The application will initially be used by only three people, but the architecture should make it possible to transform it later into a public game where other families or groups can create their own accounts and game rooms.
+
+## Core game content
+
+The game contains approximately **150 cards** divided into:
+
+* Around 135 question cards.
+* Around 15 challenge or surprise cards.
+* Power cards that players can use during a game session.
+* Game rules.
+* An optional scoring system.
+* A golden rule explaining the emotional purpose of the game.
+
+## Question categories
+
+The question cards are divided into categories such as:
+
+### How Well Do We Know Each Other?
+
+Questions about personalities, preferences, habits, emotions, gifts, reactions, and how well the players understand one another.
+
+### Memories and Stories
+
+Questions about:
+
+* First impressions.
+* Childhood memories.
+* Family occasions.
+* Shared meals and outings.
+* Meaningful moments.
+* Funny situations.
+* Important events in the players’ relationship.
+
+### Fun and Guessing
+
+Questions where players guess who is most likely to perform a certain action or behave in a certain way.
+
+Examples include:
+
+* Who is most likely to get lost?
+* Who takes the longest to choose an outfit?
+* Who is most likely to laugh during an argument?
+* Who is most likely to forget something while travelling?
+
+### From the Heart — Love and Honesty
+
+More emotional questions about:
+
+* Appreciation.
+* Trust.
+* Emotional needs.
+* Fears.
+* Reconciliation.
+* Support.
+* Love.
+* Promises.
+* Maintaining the family relationship after marriage.
+
+### The Future and Family
+
+Questions about:
+
+* Life after marriage.
+* Family traditions.
+* Future trips.
+* Weekly family activities.
+* Celebrations.
+* The relationship between Ahmed and Mamti in the future.
+* How Rahma wants the relationship between her mother and husband to develop.
+
+## Card targeting
+
+Not every card is necessarily answered in the same way.
+
+A card may target:
+
+* One specific player.
+* Two players.
+* All three players.
+* A specific relationship, such as Ahmed and Mamti.
+* A specific relationship, such as Rahma and Mamti.
+* A specific relationship, such as Ahmed and Rahma.
+* Any player selected randomly.
+* The player whose turn is currently active.
+
+The data model should support these different targeting rules without hard-coding the names Ahmed, Rahma, and Mamti into the business logic.
+
+## Game session flow
+
+A typical game session should work as follows:
+
+1. A player creates a game session.
+1'. A session code got generated.
+2. The three players join using that session code or are added to the session by their IDs.
+3. The application determines the first player, potentially using the youngest-player rule or a random selection.
+4. Turns proceed in clockwise order.
+5. During each turn, the active player draws a card.
+6. The application displays the card text, category, instructions, and targeted players.
+7. Players answer verbally in person.
+8. The active player confirms that the card has been completed.
+9. A player may use an available power card.
+10. Points may optionally be awarded.
+11. The game continues until the selected number of cards has been completed.
+
+The application should support at least two session lengths:
+
+* Short session: approximately 15 cards.
+* Long session: approximately 30 cards.
+
+It should also support a custom number of cards.
+
+## Game modes
+
+Please design the architecture to support:
+
+* Mixed mode using cards from all categories.
+* Category-specific mode.
+* Short game.
+* Long game.
+* Custom game.
+* Optional scoring mode.
+* Relaxed mode without scoring.
+* Local game, where all players use one device.
+* Future online multiplayer mode, where each player uses their own device.
+
+For the first version, local single-device gameplay is sufficient, but the database and backend design should not prevent future online multiplayer support.
+
+## Power cards
+
+At the beginning of a session, each player receives a configurable number of power cards (configurable by the admin), such as two cards.
+
+Each power card can normally be used once per session.
+
+Examples include:
+
+### Whisper
+
+The selected player answers the question by whispering the answer privately to another player.
+
+### Prefer Not to Answer
+
+The player may skip a question without explaining why.
+
+### Mirror
+
+The other players must also answer the same question.
+
+### Full Story
+
+The player must provide a detailed story rather than a short answer.
+
+### Change the Question
+
+The current card is discarded and another card is drawn.
+
+### Everyone Answers
+
+A question intended for one player becomes a question for all players.
+
+### A Word from the Heart
+
+A selected player must say something sincere and positive to another player.
+
+### No Diplomacy
+
+The player should give an honest answer instead of choosing the answer that is most likely to please others.
+
+The system should support adding new power-card types later without major database changes.
+
+Please determine whether power-card effects should be implemented using:
+
+* An enum.
+* A strategy pattern.
+* A rules engine.
+* Configurable JSON data.
+* Separate backend handlers.
+* Another suitable design.
+
+Explain the advantages and disadvantages of your recommendation.
+
+## Challenge and surprise cards
+
+Challenge cards may ask players to perform actions such as:
+
+* Whispering a positive message.
+* Making the others laugh within a limited time.
+* Taking a group photo.
+* Sharing a light confession.
+* Giving compliments.
+* Secretly ranking the players according to a personality trait.
+* Acting like another player without speaking.
+* Dedicating a song to another player.
+* Writing a family wish.
+* Selecting a family activity for the following week.
+* Describing the best moment from the current game session.
+
+Some challenge cards may require:
+
+* A timer.
+* Selecting one or more players.
+* Awarding points.
+* Entering a short text response.
+* Taking or selecting a photo.
+* Marking a challenge as completed.
+* Scheduling or saving an activity for later.
+
+The first version does not necessarily need photo upload or scheduling, but the architecture should allow these features to be added later.
+
+## Game rules
+
+The application should display the following principles before starting a game:
+
+* Players should be honest without being hurtful.
+* Players should not judge one another’s answers.
+* Answers shared during the game must not be used against a player later.
+* Players should not interrupt one another.
+* Laughing together is encouraged, but mocking another player is not allowed.
+* Every player has the right to skip a sensitive question.
+* In guessing cards, the first answer should be kept.
+* Disagreement should not become an argument.
+* Phones should only be used when required by a challenge.
+* If a question causes tension, the players should pause and reconcile before continuing.
+
+## Golden rule
+
+The game is not designed to test love or determine who is the best player.
+
+Its goal is to make every player feel heard, loved, respected, and secure within the family.
+
+If the players laugh, speak honestly, and discover something new about one another, then all three players have won.
+
+## Optional scoring system
+
+The game should work with or without scores.
+
+A player may receive points when they:
+
+* Correctly predict another player’s answer.
+* Make the other players laugh.
+* Remember an old detail that others had forgotten.
+* Give an especially honest or meaningful answer.
+* Complete a challenge successfully.
+
+At the end of a scored session, the player with the highest score may select something such as:
+
+* The next meal.
+* The next movie.
+* The next family outing.
+* The group photo.
+* The next family challenge.
+
+The data model should support multiple scoring events during one card turn and should save the reason for every awarded point.
+
+## Functional requirements
+
+The first application version should include:
+
+* User or player profiles.
+* Authentication, unless you recommend a simpler private-app approach.
+* Creating a game group.
+* Adding players to a group.
+* Creating a game session.
+* Selecting the session mode and categories.
+* Selecting the number of cards.
+* Randomized card drawing.
+* Avoiding duplicate cards within the same session.
+* Tracking the active player and turn order.
+* Displaying question, challenge, and power cards.
+* Assigning power cards to players.
+* Using and tracking power cards.
+* Skipping a question.
+* Completing a card.
+* Optional score tracking.
+* Session progress.
+* Pausing and resuming a session.
+* Viewing previous sessions.
+* Viewing cards that were already played.
+* Supporting Arabic text and right-to-left interfaces.
+* Supporting Tunisian Arabic content.
+* Preparing the application for English and French translations later.
+* An administrator interface or seed process for managing cards and categories.
+
+## Content management requirements
+
+Questions and cards must not be hard-coded in Flutter.
+
+They should be stored in a database or imported through structured seed files.
+
+Each card may require fields such as:
+
+* Identifier.
+* Card type.
+* Category.
+* Title.
+* Main text.
+* Instructions.
+* Language.
+* Targeting rule.
+* Minimum and maximum number of players.
+* Sensitivity level.
+* Difficulty or emotional-depth level.
+* Whether the card can be skipped.
+* Whether the card supports scoring.
+* Whether the card requires a timer.
+* Timer duration.
+* Whether the card is active.
+* Display order or weight.
+* Created date.
+* Updated date.
+
+Please improve this model and identify any missing fields.
+
+The application should support multiple translations of the same card without duplicating its business configuration.
+
+## Non-functional requirements
+
+The proposed solution should consider:
+
+* Clean architecture.
+* Maintainable Flutter state management.
+* Secure REST API design.
+* Input validation.
+* Global error handling.
+* Database migrations.
+* Audit fields.
+* API documentation.
+* Authentication and authorization.
+* Refresh tokens, if authentication is used.
+* Secure password storage.
+* Logging and monitoring.
+* Automated testing.
+* Docker-based local development.
+* Environment-based configuration.
+* Offline or temporary connection-loss support.
+* Arabic and right-to-left UI support.
+* Scalability for a future public release.
+* Protection of private or sensitive game-session data.
+
+## Offline behavior
+
+Because the three players may play together using one phone, the game should ideally continue if the internet connection is temporarily unavailable.
+
+Please recommend one of the following approaches, or a better alternative:
+
+* A fully local Flutter game with optional cloud synchronization.
+* A Spring Boot backend required for every action.
+* An offline-first application using a local Flutter database and background synchronization.
+* A hybrid model where public card content is cached locally while sessions are synchronized when connectivity is available.
+
+Explain which approach is most appropriate for the first version and how conflicts should be handled.
+
+## Expected technical output
+
+Act as a senior software architect and database designer.
+
+Based on the requirements above, provide the following:
+
+### 1. Recommended technology stack
+
+Recommend the complete stack for:
+
+* Flutter architecture.
+* Flutter state management.
+* Navigation.
+* Local storage.
+* HTTP client.
+* Serialization.
+* Dependency injection.
+* Backend framework and Spring Boot modules.
+* Java or Kotlin choice.
+* Database.
+* Database migrations.
+* Authentication.
+* API documentation.
+* Object storage if photos are added.
+* Real-time communication for future multiplayer.
+* Testing.
+* Logging.
+* Monitoring.
+* Deployment.
+* CI/CD.
+
+For every important choice, explain why it fits this project.
+
+### 2. System architecture
+
+Provide a clear description of:
+
+* Mobile application layers.
+* Backend layers.
+* Main backend modules.
+* Data flow.
+* Offline synchronization flow.
+* Authentication flow.
+* Game-session lifecycle.
+* Future real-time multiplayer architecture.
+
+Use a modular monolith for the first version unless a different architecture is clearly justified.
+
+### 3. Database design
+
+Design a normalized relational database schema.
+
+Include all necessary tables, fields, primary keys, foreign keys, unique constraints, indexes, enum values, status fields, and audit timestamps.
+
+At minimum, evaluate whether the system needs entities equivalent to:
+
+* Users.
+* Player profiles.
+* Groups or families.
+* Group members.
+* Relationships between group members.
+* Game sessions.
+* Session participants.
+* Session turns.
+* Card categories.
+* Cards.
+* Card translations.
+* Card targeting rules.
+* Session cards or drawn cards.
+* Player answers or notes.
+* Power-card definitions.
+* Power-card translations.
+* Assigned player power cards.
+* Power-card usage history.
+* Challenge results.
+* Score events.
+* Session scores.
+* Game rules.
+* Rule translations.
+* Media attachments.
+* Refresh tokens.
+* Device or synchronization records.
+
+Do not create unnecessary tables. Explain which entities are essential for version one and which can be postponed.
+
+### 4. SQL schema
+
+Generate PostgreSQL-compatible SQL DDL for the recommended version-one tables.
+
+The SQL should include:
+
+* UUID primary keys where appropriate.
+* Foreign keys.
+* Check constraints.
+* Unique constraints.
+* Useful indexes.
+* Created and updated timestamps.
+* Soft deletion only where it is genuinely needed.
+* Appropriate PostgreSQL enum types or check constraints.
+
+### 5. Entity relationship diagram
+
+Provide an ER diagram using Mermaid `erDiagram` syntax.
+
+### 6. API design
+
+Propose versioned REST endpoints for:
+
+* Authentication.
+* Current user profile.
+* Groups.
+* Group members.
+* Cards and categories.
+* Starting a session.
+* Joining a session.
+* Drawing the next card.
+* Completing or skipping a card.
+* Assigning and using power cards.
+* Awarding points.
+* Pausing and resuming a session.
+* Finishing a session.
+* Viewing session history.
+
+For each endpoint, include:
+
+* HTTP method.
+* URL.
+* Purpose.
+* Important request fields.
+* Important response fields.
+* Required authorization.
+
+Avoid exposing database entities directly through the API.
+
+### 7. Game state model
+
+Define the game-session states and valid transitions.
+
+Possible states may include:
+
+* Draft.
+* Waiting for players.
+* Ready.
+* In progress.
+* Paused.
+* Completed.
+* Cancelled.
+
+Also define card-turn states such as:
+
+* Drawn.
+* Displayed.
+* Answered.
+* Completed.
+* Skipped.
+* Replaced.
+
+Explain how concurrency should be handled so that the same card is not drawn twice and two players cannot incorrectly advance the same turn.
+
+### 8. Flutter project structure
+
+Propose a feature-first Flutter folder structure for:
+
+* Authentication.
+* Home.
+* Groups.
+* Game setup.
+* Active game.
+* Cards.
+* Power cards.
+* Session results.
+* Session history.
+* Settings.
+* Shared design system.
+* Localization.
+* Offline synchronization.
+
+### 9. Spring Boot project structure
+
+Propose a package structure organized by business feature or bounded context rather than only by technical layer.
+
+### 10. MVP roadmap
+
+Divide development into practical phases:
+
+* Phase 1: Basic local playable prototype.
+* Phase 2: Backend, accounts, and synchronization.
+* Phase 3: Session history and content management.
+* Phase 4: Online multiplayer.
+* Phase 5: Public commercial version.
+
+For every phase, identify the essential features and features that should be postponed.
+
+### 11. Important design decisions
+
+Explicitly answer these questions:
+
+1. Does the first private version really need user authentication?
+2. Should cards be loaded from the backend, bundled locally, or both?
+3. Should answers be recorded, considering that many answers will be spoken and private?
+4. Should the application store only completion state and scores rather than the players’ private answers?
+5. How should sensitive questions be classified and filtered?
+6. Should targeting rules be represented using database rows, enums, or JSON configuration?
+7. How should card randomization avoid repeats and remain reproducible after pausing a session?
+8. How should the system support more than three players in a future public version?
+9. Which features would be unnecessarily complex for the MVP?
+10. What security and privacy risks are specific to this emotionally personal game?
+
+When making recommendations, distinguish clearly between:
+
+* What is required for the initial three-player private version.
+* What should be prepared architecturally for later.
+* What should not be implemented until the application becomes public.
+  
+
+
+
+
+there are some things i want to mentions: 
+-the online mode is necessary, and should exists from the first version of the app 
+-each used card is placed in the trash and should never be used again in any future games, only if the admin remove it from trash 
+-from home screen, the player can add players by their IDs, or invite them using game session code, and also he chooses the game mode : 
+i want u to add an other game mode from the existing ones, which is , 'best cards', that contains the best cards (so the card should have a boolean attribute named "best" to know if it's best or not, and the admin have an interface, to make a card best or remove it from best list) 
+-other thing, the questions will be in a json file, (tell me if this is a good idea), and the background of the card will always be the same, only the text will be changed 

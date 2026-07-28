@@ -18,6 +18,8 @@ class BetweenThreeApp extends ConsumerWidget {
       routerConfig: router,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
+      // v0 is Tunisian Arabic only (see plan); RTL follows automatically.
+      locale: const Locale('ar'),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,

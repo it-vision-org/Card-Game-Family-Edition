@@ -47,6 +47,22 @@ app:
     access-token-secret: ${JWT_ACCESS_SECRET:local-access-secret-change-me}
     refresh-token-secret: ${JWT_REFRESH_SECRET:local-refresh-secret-change-me}
 
+  seed:
+    enabled: ${APP_SEED_ENABLED:true}
+    players:
+      - public-id: AHMED
+        display-name: أحمد
+        pin: ${SEED_PIN_AHMED:0000}
+        role: ADMIN
+      - public-id: RAHMA
+        display-name: رحمة
+        pin: ${SEED_PIN_RAHMA:0000}
+        role: PLAYER
+      - public-id: MAMTI
+        display-name: ماما
+        pin: ${SEED_PIN_MAMTI:0000}
+        role: PLAYER
+
 logging:
   level:
     root: INFO
