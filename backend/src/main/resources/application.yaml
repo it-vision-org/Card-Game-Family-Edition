@@ -59,7 +59,7 @@ app:
         pin: ${SEED_PIN_RAHMA:0000}
         role: PLAYER
       - public-id: MAMTI
-        display-name: ماما
+        display-name: مامتي
         pin: ${SEED_PIN_MAMTI:0000}
         role: PLAYER
 

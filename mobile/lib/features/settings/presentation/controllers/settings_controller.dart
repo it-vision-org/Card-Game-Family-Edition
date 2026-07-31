@@ -8,6 +8,7 @@ final gameSettingsProvider = FutureProvider.autoDispose<GameSettings>((ref) {
   return ref.watch(settingsRepositoryProvider).getGameSettings();
 });
 
-final trashProvider = FutureProvider.autoDispose.family<List<TrashEntry>, String>((ref, groupId) {
-  return ref.watch(settingsRepositoryProvider).listTrash(groupId);
-});
+final trashProvider = FutureProvider.autoDispose
+    .family<List<TrashEntry>, String>((ref, groupId) {
+      return ref.watch(settingsRepositoryProvider).listTrash(groupId);
+    });

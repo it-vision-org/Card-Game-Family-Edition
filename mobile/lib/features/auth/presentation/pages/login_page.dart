@@ -15,7 +15,7 @@ class _Profile {
 const _profiles = [
   _Profile('AHMED', 'أحمد', '🧑'),
   _Profile('RAHMA', 'رحمة', '👩'),
-  _Profile('MAMTI', 'ماما', '👵'),
+  _Profile('MAMTI', 'مامتي', '👵'),
 ];
 
 class LoginPage extends ConsumerStatefulWidget {

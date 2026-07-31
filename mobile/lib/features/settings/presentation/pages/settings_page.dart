@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/theme/app_semantic_colors.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -22,6 +24,16 @@ class SettingsPage extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           const _ChangePinSection(),
+          const Divider(height: 40),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.style_outlined),
+              title: const Text('أسئلتي'),
+              subtitle: const Text('زيد أسئلتك الخاصة وإدارتها'),
+              trailing: const Icon(Icons.chevron_left),
+              onTap: () => context.push('/my-cards'),
+            ),
+          ),
           if (user?.isAdmin == true) ...[
             const Divider(height: 40),
             const _PowerCardsPerPlayerSection(),
@@ -29,7 +41,9 @@ class SettingsPage extends ConsumerWidget {
             groupAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, _) => Text('$error'),
-              data: (group) => group == null ? const SizedBox.shrink() : _TrashSection(groupId: group.id),
+              data: (group) => group == null
+                  ? const SizedBox.shrink()
+                  : _TrashSection(groupId: group.id),
             ),
           ],
         ],
@@ -73,15 +87,21 @@ class _ChangePinSectionState extends ConsumerState<_ChangePinSection> {
               controller: _currentPinController,
               obscureText: true,
               keyboardType: TextInputType.number,
-              maxLength: 6,
-              decoration: const InputDecoration(labelText: 'الرمز الحالي', counterText: ''),
+              maxLength: 10,
+              decoration: const InputDecoration(
+                labelText: 'الرمز الحالي',
+                counterText: '',
+              ),
             ),
             TextField(
               controller: _newPinController,
               obscureText: true,
               keyboardType: TextInputType.number,
-              maxLength: 6,
-              decoration: const InputDecoration(labelText: 'الرمز الجديد', counterText: ''),
+              maxLength: 10,
+              decoration: const InputDecoration(
+                labelText: 'الرمز الجديد',
+                counterText: '',
+              ),
             ),
             const SizedBox(height: 8),
             if (_message != null)
@@ -90,14 +110,22 @@ class _ChangePinSectionState extends ConsumerState<_ChangePinSection> {
                 child: Text(
                   _message!,
                   style: TextStyle(
-                    color: _isError ? Theme.of(context).colorScheme.error : Colors.green,
+                    color: _isError
+                        ? Theme.of(context).colorScheme.error
+                        : Theme.of(
+                            context,
+                          ).extension<AppSemanticColors>()!.success,
                   ),
                 ),
               ),
             FilledButton(
               onPressed: _submitting ? null : _submit,
               child: _submitting
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('تغيير الرمز السري'),
             ),
           ],
@@ -113,7 +141,9 @@ class _ChangePinSectionState extends ConsumerState<_ChangePinSection> {
     });
 
     try {
-      await ref.read(authRepositoryProvider).changePin(
+      await ref
+          .read(authRepositoryProvider)
+          .changePin(
             currentPin: _currentPinController.text,
             newPin: _newPinController.text,
           );
@@ -140,10 +170,12 @@ class _PowerCardsPerPlayerSection extends ConsumerStatefulWidget {
   const _PowerCardsPerPlayerSection();
 
   @override
-  ConsumerState<_PowerCardsPerPlayerSection> createState() => _PowerCardsPerPlayerSectionState();
+  ConsumerState<_PowerCardsPerPlayerSection> createState() =>
+      _PowerCardsPerPlayerSectionState();
 }
 
-class _PowerCardsPerPlayerSectionState extends ConsumerState<_PowerCardsPerPlayerSection> {
+class _PowerCardsPerPlayerSectionState
+    extends ConsumerState<_PowerCardsPerPlayerSection> {
   bool _submitting = false;
 
   @override
@@ -156,7 +188,10 @@ class _PowerCardsPerPlayerSectionState extends ConsumerState<_PowerCardsPerPlaye
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('عدد بطاقات القوة لكل لاعب', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'عدد بطاقات القوة لكل لاعب',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 12),
             settingsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -170,7 +205,10 @@ class _PowerCardsPerPlayerSectionState extends ConsumerState<_PowerCardsPerPlaye
                         ? null
                         : () => _update(settings.powerCardsPerPlayer - 1),
                   ),
-                  Text('${settings.powerCardsPerPlayer}', style: Theme.of(context).textTheme.headlineSmall),
+                  Text(
+                    '${settings.powerCardsPerPlayer}',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                   IconButton(
                     icon: const Icon(Icons.add_circle_outline),
                     onPressed: _submitting || settings.powerCardsPerPlayer >= 50
@@ -189,11 +227,15 @@ class _PowerCardsPerPlayerSectionState extends ConsumerState<_PowerCardsPerPlaye
   Future<void> _update(int value) async {
     setState(() => _submitting = true);
     try {
-      await ref.read(settingsRepositoryProvider).updatePowerCardsPerPlayer(value);
+      await ref
+          .read(settingsRepositoryProvider)
+          .updatePowerCardsPerPlayer(value);
       ref.invalidate(gameSettingsProvider);
     } on ApiException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
       }
     } finally {
       if (mounted) {
@@ -203,14 +245,42 @@ class _PowerCardsPerPlayerSectionState extends ConsumerState<_PowerCardsPerPlaye
   }
 }
 
-class _TrashSection extends ConsumerWidget {
+class _TrashSection extends ConsumerStatefulWidget {
   const _TrashSection({required this.groupId});
 
   final String groupId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final trashAsync = ref.watch(trashProvider(groupId));
+  ConsumerState<_TrashSection> createState() => _TrashSectionState();
+}
+
+class _TrashSectionState extends ConsumerState<_TrashSection> {
+  final Set<String> _selectedCardIds = {};
+  bool _restoring = false;
+
+  Future<void> _restoreIds(List<String> cardIds) async {
+    if (cardIds.isEmpty) return;
+    setState(() => _restoring = true);
+    try {
+      await ref
+          .read(settingsRepositoryProvider)
+          .restoreCardsBulk(widget.groupId, cardIds);
+      _selectedCardIds.removeAll(cardIds);
+      ref.invalidate(trashProvider(widget.groupId));
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    } finally {
+      if (mounted) setState(() => _restoring = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final trashAsync = ref.watch(trashProvider(widget.groupId));
 
     return Card(
       child: Padding(
@@ -218,7 +288,10 @@ class _TrashSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('الكارطات المحذوفة', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'الكارطات المحذوفة',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 12),
             trashAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -227,27 +300,66 @@ class _TrashSection extends ConsumerWidget {
                 if (entries.isEmpty) {
                   return const Text('ما فماش كارطات محذوفة حاليًا');
                 }
+                final selectedCount = _selectedCardIds.length;
                 return Column(
-                  children: entries.map((entry) {
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(entry.externalKey),
-                      trailing: TextButton(
-                        onPressed: () async {
-                          try {
-                            await ref.read(settingsRepositoryProvider).restoreCard(groupId, entry.cardId);
-                            ref.invalidate(trashProvider(groupId));
-                          } on ApiException catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(content: Text(e.message)));
-                            }
-                          }
-                        },
-                        child: const Text('استرجاع'),
-                      ),
-                    );
-                  }).toList(),
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _restoring
+                                ? null
+                                : () => _restoreIds(
+                                    entries.map((e) => e.cardId).toList(),
+                                  ),
+                            icon: const Icon(Icons.restore),
+                            label: const Text('استرجاع الكل'),
+                          ),
+                        ),
+                        if (selectedCount > 0) ...[
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: _restoring
+                                  ? null
+                                  : () =>
+                                        _restoreIds(_selectedCardIds.toList()),
+                              icon: const Icon(Icons.restore),
+                              label: Text('استرجاع ($selectedCount)'),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    ...entries.map((entry) {
+                      final selected = _selectedCardIds.contains(entry.cardId);
+                      return CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        value: selected,
+                        onChanged: _restoring
+                            ? null
+                            : (value) {
+                                setState(() {
+                                  if (value == true) {
+                                    _selectedCardIds.add(entry.cardId);
+                                  } else {
+                                    _selectedCardIds.remove(entry.cardId);
+                                  }
+                                });
+                              },
+                        title: Text(entry.externalKey),
+                        secondary: TextButton(
+                          onPressed: _restoring
+                              ? null
+                              : () => _restoreIds([entry.cardId]),
+                          child: const Text('استرجاع'),
+                        ),
+                      );
+                    }),
+                  ],
                 );
               },
             ),

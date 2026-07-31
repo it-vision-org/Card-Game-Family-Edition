@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../data/models/session_state.dart';
 
 /// The card face: the illustrated watercolor frame in
@@ -19,12 +20,10 @@ class GameCardWidget extends StatelessWidget {
     'CHALLENGES_AND_SURPRISES': 'مفاجأة وتحدّي',
   };
 
-  // Sampled from card-background.png's watercolor palette so the text reads
-  // naturally against the cream center instead of needing a dark overlay.
-  static const _titleColor = Color(0xFF6B3F3A);
-  static const _bodyColor = Color(0xFF5A4038);
-  static const _labelColor = Color(0xFF8B6F5E);
-  static const _badgeBackground = Color(0x1F6B3F3A);
+  static const _titleColor = AppColors.textPrimary;
+  static const _bodyColor = AppColors.textPrimary;
+  static const _labelColor = AppColors.textSecondary;
+  static const _badgeBackground = AppColors.primaryLight;
 
   @override
   Widget build(BuildContext context) {
@@ -42,61 +41,86 @@ class GameCardWidget extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 16, offset: const Offset(0, 8)),
+            BoxShadow(
+              color: AppColors.shadow.withValues(alpha: 0.18),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
           ],
         ),
-        padding: const EdgeInsets.fromLTRB(56, 72, 56, 56),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  _categoryLabels[card.categoryCode] ?? (isChallenge ? 'مفاجأة وتحدّي' : ''),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: _labelColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (card.title != null) ...[
+        padding: const EdgeInsets.fromLTRB(56, 64, 56, 56),
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                   Text(
-                    card.title!,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleLarge?.copyWith(color: _titleColor, fontWeight: FontWeight.bold),
+                    _categoryLabels[card.categoryCode] ??
+                        (isChallenge ? 'مفاجأة وتحدّي' : ''),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: _labelColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                ],
-                Text(
-                  card.text ?? '',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: _bodyColor,
-                    height: 1.4,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (card.instructions != null) ...[
-                  const SizedBox(height: 14),
-                  Text(
-                    card.instructions!,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: _labelColor),
-                  ),
-                ],
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 8,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    if (card.timerSeconds != null)
-                      _Badge(icon: Icons.timer_outlined, label: '${card.timerSeconds} ث'),
-                    if (card.supportsScoring) const _Badge(icon: Icons.emoji_events_outlined, label: 'فيها نقاط'),
-                    if (card.skippable) const _Badge(icon: Icons.skip_next_outlined, label: 'يمكن تجاوزها'),
+                  const SizedBox(height: 6),
+                  if (card.title != null) ...[
+                    Text(
+                      card.title!,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: _titleColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
                   ],
-                ),
-              ],
+                  Text(
+                    card.text ?? '',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: _bodyColor,
+                      height: 1.2,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (card.instructions != null) ...[
+                    const SizedBox(height: 18),
+                    Text(
+                      card.instructions!,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: _labelColor,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      if (card.timerSeconds != null)
+                        _Badge(
+                          icon: Icons.timer_outlined,
+                          label: '${card.timerSeconds} ث',
+                        ),
+                      if (card.supportsScoring)
+                        const _Badge(
+                          icon: Icons.emoji_events_outlined,
+                          label: 'فيها نقاط',
+                        ),
+                      if (card.skippable)
+                        const _Badge(
+                          icon: Icons.skip_next_outlined,
+                          label: 'يمكن تجاوزها',
+                        ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -118,13 +142,20 @@ class _Badge extends StatelessWidget {
       decoration: BoxDecoration(
         color: GameCardWidget._badgeBackground,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: GameCardWidget._titleColor),
           const SizedBox(width: 4),
-          Text(label, style: const TextStyle(color: GameCardWidget._titleColor, fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: GameCardWidget._titleColor,
+              fontSize: 12,
+            ),
+          ),
         ],
       ),
     );

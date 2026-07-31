@@ -18,4 +18,6 @@ public interface CardTrashRepository extends JpaRepository<CardTrash, UUID> {
     List<CardTrash> findByGroupId(UUID groupId);
 
     Optional<CardTrash> findByGroupIdAndCardId(UUID groupId, UUID cardId);
+
+    List<CardTrash> findByGroupIdAndCardIdIn(UUID groupId, List<UUID> cardIds);
 }

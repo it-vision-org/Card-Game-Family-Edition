@@ -38,7 +38,9 @@ class SettingsRepository {
 
   Future<List<TrashEntry>> listTrash(String groupId) async {
     try {
-      final response = await _dio.get<List<dynamic>>('/admin/groups/$groupId/trash');
+      final response = await _dio.get<List<dynamic>>(
+        '/admin/groups/$groupId/trash',
+      );
       return response.data!
           .map((json) => TrashEntry.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -50,6 +52,17 @@ class SettingsRepository {
   Future<void> restoreCard(String groupId, String cardId) async {
     try {
       await _dio.post<void>('/admin/groups/$groupId/trash/$cardId/restore');
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  Future<void> restoreCardsBulk(String groupId, List<String> cardIds) async {
+    try {
+      await _dio.post<void>(
+        '/admin/groups/$groupId/trash/restore-bulk',
+        data: {'cardIds': cardIds},
+      );
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
     }

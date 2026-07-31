@@ -25,7 +25,7 @@ void main() {
 
     expect(find.textContaining('أحمد'), findsOneWidget);
     expect(find.textContaining('رحمة'), findsOneWidget);
-    expect(find.textContaining('ماما'), findsOneWidget);
+    expect(find.textContaining('مامتي'), findsOneWidget);
     expect(find.text('دخول'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
   });

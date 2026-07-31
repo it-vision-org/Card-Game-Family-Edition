@@ -8,9 +8,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import tn.itvision.betweenthree.common.api.ApiException;
 import tn.itvision.betweenthree.sessions.domain.CardTrash;
 import tn.itvision.betweenthree.sessions.repository.CardTrashRepository;
@@ -42,6 +45,16 @@ public class AdminTrashController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/restore-bulk")
+    public ResponseEntity<Void> restoreBulk(@PathVariable UUID groupId, @Valid @RequestBody RestoreBulkRequest request) {
+        List<CardTrash> entries = cardTrashRepository.findByGroupIdAndCardIdIn(groupId, request.cardIds());
+        cardTrashRepository.deleteAll(entries);
+        return ResponseEntity.noContent().build();
+    }
+
     private record TrashEntryResponse(UUID trashId, UUID cardId, String externalKey, java.time.Instant trashedAt) {
+    }
+
+    private record RestoreBulkRequest(@NotEmpty List<UUID> cardIds) {
     }
 }

@@ -15,6 +15,8 @@ public interface CardRepository extends JpaRepository<Card, UUID>, JpaSpecificat
 
     Optional<Card> findByExternalKey(String externalKey);
 
+    List<Card> findByCreatedByUserId(UUID createdByUserId);
+
     /**
      * Builds the predicate with a {@link Specification} rather than a single
      * JPQL query with {@code :param is null or ...} guards: Postgres cannot

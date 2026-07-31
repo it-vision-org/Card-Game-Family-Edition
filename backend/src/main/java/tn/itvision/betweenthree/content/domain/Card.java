@@ -97,6 +97,14 @@ public class Card {
     @Column(name = "selection_weight", nullable = false)
     private int selectionWeight = 100;
 
+    /**
+     * Set only for player-authored cards created from the "Cards" screen;
+     * {@code null} for the original curated/seeded catalog. Used to scope
+     * the my-cards CRUD endpoints so a player can only manage their own.
+     */
+    @Column(name = "created_by_user_id")
+    private UUID createdByUserId;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
