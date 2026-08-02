@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/models/session_state.dart';
 import '../controllers/session_controller.dart';
 import '../widgets/card_timer.dart';
@@ -28,11 +29,46 @@ class ActiveGamePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionAsync = ref.watch(sessionControllerProvider(sessionId));
     final controller = ref.read(sessionControllerProvider(sessionId).notifier);
+    final currentUser = ref.watch(authControllerProvider).value;
 
     ref.listen(sessionControllerProvider(sessionId), (previous, next) {
       final session = next.value;
-      if (session != null && session.status == 'COMPLETED') {
+      if (session == null) return;
+
+      if (session.status == 'COMPLETED') {
         context.pushReplacement('/session/$sessionId/results');
+      }
+
+      final previousSession = previous?.value;
+      if (previousSession == null) return;
+
+      final myUserId = ref.read(authControllerProvider).value?.id;
+      for (final participant in session.participants) {
+        if (participant.userId == myUserId) continue;
+        final previousParticipant = _participantById(
+          previousSession.participants,
+          participant.id,
+        );
+        if (previousParticipant == null) continue;
+
+        for (final assignment in participant.powerCards) {
+          if (!assignment.used) continue;
+          final wasAlreadyUsed =
+              _assignmentById(
+                previousParticipant.powerCards,
+                assignment.id,
+              )?.used ??
+              false;
+          if (!wasAlreadyUsed && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '${participant.displayName} استعمل بطاقة "${assignment.title}"',
+                ),
+              ),
+            );
+          }
+        }
       }
     });
 
@@ -44,14 +80,26 @@ class ActiveGamePage extends ConsumerWidget {
             IconButton(
               tooltip: 'منح نقطة',
               icon: const Icon(Icons.emoji_events_outlined),
-              onPressed: () => _showAwardScoreDialog(context, ref, sessionAsync.value!.participants),
+              onPressed: () => _showAwardScoreDialog(
+                context,
+                ref,
+                sessionAsync.value!.participants,
+              ),
             ),
           IconButton(
-            tooltip: sessionAsync.value?.status == 'PAUSED' ? 'كمّل' : 'وقّف مؤقتًا',
-            icon: Icon(sessionAsync.value?.status == 'PAUSED' ? Icons.play_arrow : Icons.pause),
+            tooltip: sessionAsync.value?.status == 'PAUSED'
+                ? 'كمّل'
+                : 'وقّف مؤقتًا',
+            icon: Icon(
+              sessionAsync.value?.status == 'PAUSED'
+                  ? Icons.play_arrow
+                  : Icons.pause,
+            ),
             onPressed: () => _handle(
               context,
-              sessionAsync.value?.status == 'PAUSED' ? controller.resume() : controller.pause(),
+              sessionAsync.value?.status == 'PAUSED'
+                  ? controller.resume()
+                  : controller.pause(),
             ),
           ),
         ],
@@ -61,12 +109,26 @@ class ActiveGamePage extends ConsumerWidget {
         error: (error, _) => Center(child: Text('$error')),
         data: (session) {
           final card = session.currentCard;
-          final playersOnTurn = session.participants.where((p) => p.currentTurn).toList();
-          final currentTurnParticipant = playersOnTurn.isEmpty ? null : playersOnTurn.first;
+          final playersOnTurn = session.participants
+              .where((p) => p.currentTurn)
+              .toList();
+          final currentTurnParticipant = playersOnTurn.isEmpty
+              ? null
+              : playersOnTurn.first;
+          final myParticipant = currentUser == null
+              ? null
+              : _participantByUserId(session.participants, currentUser.id);
+          final isMyTurn =
+              currentTurnParticipant != null &&
+              myParticipant != null &&
+              currentTurnParticipant.id == myParticipant.id;
 
           return Column(
             children: [
-              TurnIndicator(participants: session.participants, scoringEnabled: session.scoringEnabled),
+              TurnIndicator(
+                participants: session.participants,
+                scoringEnabled: session.scoringEnabled,
+              ),
               LinearProgressIndicator(
                 value: session.requestedCardCount == 0
                     ? 0
@@ -74,12 +136,17 @@ class ActiveGamePage extends ConsumerWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text('${session.completedCardCount} / ${session.requestedCardCount} كارطة'),
+                child: Text(
+                  '${session.completedCardCount} / ${session.requestedCardCount} كارطة',
+                ),
               ),
               if (session.status == 'PAUSED')
                 const Padding(
                   padding: EdgeInsets.all(8),
-                  child: Text('الجلسة متوقفة مؤقتًا', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'الجلسة متوقفة مؤقتًا',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               Expanded(
                 child: SingleChildScrollView(
@@ -97,12 +164,15 @@ class ActiveGamePage extends ConsumerWidget {
                             participantCount: session.participants.length,
                           )
                         else
-                          CardTimer(sessionCardId: card.sessionCardId, seconds: card.timerSeconds!),
+                          CardTimer(
+                            sessionCardId: card.sessionCardId,
+                            seconds: card.timerSeconds!,
+                          ),
                       ],
                       const SizedBox(height: 20),
-                      if (currentTurnParticipant != null)
+                      if (myParticipant != null)
                         PowerCardTray(
-                          participant: currentTurnParticipant,
+                          participant: myParticipant,
                           onUse: (assignment) => _handle(
                             context,
                             controller.usePowerCard(assignment.id),
@@ -120,10 +190,14 @@ class ActiveGamePage extends ConsumerWidget {
                       if (card.skippable)
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () => _handle(
-                              context,
-                              controller.skipCurrentCard(card.sessionCardId),
-                            ),
+                            onPressed: isMyTurn
+                                ? () => _handle(
+                                    context,
+                                    controller.skipCurrentCard(
+                                      card.sessionCardId,
+                                    ),
+                                  )
+                                : null,
                             child: const Text('تجاوز'),
                           ),
                         ),
@@ -131,10 +205,14 @@ class ActiveGamePage extends ConsumerWidget {
                       Expanded(
                         flex: 2,
                         child: FilledButton(
-                          onPressed: () => _handle(
-                            context,
-                            controller.completeCurrentCard(card.sessionCardId),
-                          ),
+                          onPressed: isMyTurn
+                              ? () => _handle(
+                                  context,
+                                  controller.completeCurrentCard(
+                                    card.sessionCardId,
+                                  ),
+                                )
+                              : null,
                           child: const Text('تمّت'),
                         ),
                       ),
@@ -153,7 +231,9 @@ class ActiveGamePage extends ConsumerWidget {
       await future;
     } on ApiException catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
       }
     }
   }
@@ -217,7 +297,11 @@ class ActiveGamePage extends ConsumerWidget {
                           Navigator.of(dialogContext).pop();
                           _handle(
                             context,
-                            ref.read(sessionControllerProvider(sessionId).notifier).awardScore(
+                            ref
+                                .read(
+                                  sessionControllerProvider(sessionId).notifier,
+                                )
+                                .awardScore(
                                   participantId: selected!.id,
                                   points: 1,
                                   reasonCode: reasonCode,
@@ -233,4 +317,31 @@ class ActiveGamePage extends ConsumerWidget {
       },
     );
   }
+}
+
+Participant? _participantByUserId(
+  List<Participant> participants,
+  String userId,
+) {
+  for (final participant in participants) {
+    if (participant.userId == userId) return participant;
+  }
+  return null;
+}
+
+Participant? _participantById(List<Participant> participants, String id) {
+  for (final participant in participants) {
+    if (participant.id == id) return participant;
+  }
+  return null;
+}
+
+PowerCardAssignment? _assignmentById(
+  List<PowerCardAssignment> assignments,
+  String id,
+) {
+  for (final assignment in assignments) {
+    if (assignment.id == id) return assignment;
+  }
+  return null;
 }

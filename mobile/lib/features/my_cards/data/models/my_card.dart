@@ -4,6 +4,7 @@ class MyCard {
     required this.categoryCode,
     required this.text,
     required this.eligiblePlayerPublicIds,
+    required this.best,
   });
 
   factory MyCard.fromJson(Map<String, dynamic> json) {
@@ -15,6 +16,7 @@ class MyCard {
           (json['eligiblePlayerPublicIds'] as List<dynamic>)
               .map((e) => e as String)
               .toList(),
+      best: json['best'] as bool? ?? false,
     );
   }
 
@@ -22,4 +24,5 @@ class MyCard {
   final String categoryCode;
   final String text;
   final List<String> eligiblePlayerPublicIds;
+  final bool best;
 }

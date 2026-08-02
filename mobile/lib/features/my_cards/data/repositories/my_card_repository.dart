@@ -29,6 +29,7 @@ class MyCardRepository {
     required String categoryCode,
     required String text,
     required List<String> eligiblePlayerPublicIds,
+    required bool best,
   }) async {
     try {
       await _dio.post<Map<String, dynamic>>(
@@ -37,6 +38,7 @@ class MyCardRepository {
           'categoryCode': categoryCode,
           'text': text,
           'eligiblePlayerPublicIds': eligiblePlayerPublicIds,
+          'best': best,
         },
       );
     } on DioException catch (e) {
@@ -49,6 +51,7 @@ class MyCardRepository {
     required String categoryCode,
     required String text,
     required List<String> eligiblePlayerPublicIds,
+    required bool best,
   }) async {
     try {
       await _dio.put<Map<String, dynamic>>(
@@ -57,6 +60,7 @@ class MyCardRepository {
           'categoryCode': categoryCode,
           'text': text,
           'eligiblePlayerPublicIds': eligiblePlayerPublicIds,
+          'best': best,
         },
       );
     } on DioException catch (e) {

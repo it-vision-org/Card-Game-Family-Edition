@@ -139,7 +139,22 @@ class _MyCardTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(categoryLabel, style: Theme.of(context).textTheme.labelLarge),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    categoryLabel,
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                ),
+                if (card.best)
+                  Icon(
+                    Icons.star,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+              ],
+            ),
             const SizedBox(height: 8),
             Text(card.text, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
@@ -185,6 +200,7 @@ class _MyCardFormState extends ConsumerState<_MyCardForm> {
   late final TextEditingController _textController;
   String? _categoryCode;
   late final Set<String> _selectedPublicIds;
+  bool _isBest = false;
   bool _submitting = false;
   String? _errorMessage;
 
@@ -196,6 +212,7 @@ class _MyCardFormState extends ConsumerState<_MyCardForm> {
     _selectedPublicIds = {
       ...(widget.existing?.eligiblePlayerPublicIds ?? const []),
     };
+    _isBest = widget.existing?.best ?? false;
   }
 
   @override
@@ -276,6 +293,14 @@ class _MyCardFormState extends ConsumerState<_MyCardForm> {
                 );
               }).toList(),
             ),
+            const SizedBox(height: 8),
+            CheckboxListTile(
+              value: _isBest,
+              onChanged: (value) => setState(() => _isBest = value ?? false),
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              title: const Text('من أفضل الكارطات؟'),
+            ),
             if (_errorMessage != null) ...[
               const SizedBox(height: 12),
               Text(
@@ -323,12 +348,14 @@ class _MyCardFormState extends ConsumerState<_MyCardForm> {
           categoryCode: _categoryCode!,
           text: text,
           eligiblePlayerPublicIds: _selectedPublicIds.toList(),
+          best: _isBest,
         );
       } else {
         await repository.createCard(
           categoryCode: _categoryCode!,
           text: text,
           eligiblePlayerPublicIds: _selectedPublicIds.toList(),
+          best: _isBest,
         );
       }
       if (mounted) Navigator.of(context).pop();

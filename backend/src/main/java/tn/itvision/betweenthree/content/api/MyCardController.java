@@ -86,7 +86,7 @@ public class MyCardController {
         card.setCardType(CardType.QUESTION);
         card.setEligiblePlayerPublicIds(request.eligiblePlayerPublicIds());
         card.setActive(true);
-        card.setBest(false);
+        card.setBest(request.best());
         card.setSkippable(true);
         card.setSupportsScoring(false);
         card.setSensitivityLevel((short) 1);
@@ -113,6 +113,7 @@ public class MyCardController {
 
         card.setCategory(category);
         card.setEligiblePlayerPublicIds(request.eligiblePlayerPublicIds());
+        card.setBest(request.best());
         Card savedCard = cardRepository.save(card);
 
         CardTranslation translation = translationRepository
