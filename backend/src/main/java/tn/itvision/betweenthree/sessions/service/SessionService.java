@@ -153,7 +153,7 @@ public class SessionService {
         session.setStatus(SessionStatus.WAITING_FOR_PLAYERS);
         session = gameSessionRepository.save(session);
 
-        addParticipantInternal(session, creator);
+        addParticipantInternal(session, creator, false);
 
         return toStateResponse(session);
     }
@@ -164,7 +164,7 @@ public class SessionService {
         requireGroupMember(session.getGroup().getId(), user.getId());
 
         if (participantRepository.findBySessionIdAndUserId(session.getId(), user.getId()).isEmpty()) {
-            addParticipantInternal(session, user);
+            addParticipantInternal(session, user, true);
         }
 
         return toStateResponse(session);
@@ -178,7 +178,7 @@ public class SessionService {
         requireGroupMember(session.getGroup().getId(), user.getId());
 
         if (participantRepository.findBySessionIdAndUserId(sessionId, user.getId()).isEmpty()) {
-            addParticipantInternal(session, user);
+            addParticipantInternal(session, user, false);
         }
 
         return toStateResponse(session);
@@ -509,9 +509,11 @@ public class SessionService {
         cardTrashRepository.save(new CardTrash(session.getGroup(), sessionCard.getCard(), session));
     }
 
-    private void addParticipantInternal(GameSession session, AppUser user) {
+    private void addParticipantInternal(GameSession session, AppUser user, boolean joinedViaCode) {
         int nextPosition = (int) participantRepository.countBySessionId(session.getId());
-        participantRepository.save(new SessionParticipant(session, user, nextPosition));
+        SessionParticipant participant = new SessionParticipant(session, user, nextPosition);
+        participant.setJoinedViaCode(joinedViaCode);
+        participantRepository.save(participant);
 
         // The newcomer hasn't chosen their power cards yet; a session that had
         // already reached READY needs to go back to waiting for them.
@@ -653,6 +655,7 @@ public class SessionService {
                 p.getTurnPosition(),
                 p.getScore(),
                 session.getCurrentTurnPosition() != null && session.getCurrentTurnPosition() == p.getTurnPosition(),
+                p.isJoinedViaCode(),
                 powerCardsByParticipant.getOrDefault(p.getId(), List.of()).stream()
                     .map(pc -> new PowerCardAssignmentResponse(
                         pc.getId(),

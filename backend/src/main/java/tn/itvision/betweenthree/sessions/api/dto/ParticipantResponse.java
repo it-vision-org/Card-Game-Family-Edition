@@ -11,6 +11,7 @@ public record ParticipantResponse(
     int turnPosition,
     int score,
     boolean currentTurn,
+    boolean joinedViaCode,
     List<PowerCardAssignmentResponse> powerCards
 ) {
 }

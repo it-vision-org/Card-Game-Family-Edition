@@ -42,6 +42,7 @@ class ActiveGamePage extends ConsumerWidget {
 
       final previousSession = previous?.value;
       if (previousSession == null) return;
+      if (!session.isMultiDevice) return;
 
       final myUserId = ref.read(authControllerProvider).value?.id;
       for (final participant in session.participants) {
@@ -77,7 +78,10 @@ class ActiveGamePage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('الجلسة جارية'),
         actions: [
-          VoiceChatControls(sessionId: sessionId),
+          VoiceChatControls(
+            sessionId: sessionId,
+            enabled: sessionAsync.value?.isMultiDevice ?? false,
+          ),
           if (sessionAsync.value?.scoringEnabled == true)
             IconButton(
               tooltip: 'منح نقطة',
@@ -117,13 +121,25 @@ class ActiveGamePage extends ConsumerWidget {
           final currentTurnParticipant = playersOnTurn.isEmpty
               ? null
               : playersOnTurn.first;
-          final myParticipant = currentUser == null
-              ? null
-              : _participantByUserId(session.participants, currentUser.id);
+          final isMultiDevice = session.isMultiDevice;
+          // In single-device mode (one phone passed around the table), the
+          // logged-in user isn't necessarily whoever's turn it is — so show
+          // whichever participant is currently up, same as before this
+          // feature existed. In real multi-device mode, always show this
+          // device's own participant's power cards.
+          final myParticipant = isMultiDevice
+              ? (currentUser == null
+                    ? null
+                    : _participantByUserId(
+                        session.participants,
+                        currentUser.id,
+                      ))
+              : currentTurnParticipant;
           final isMyTurn =
-              currentTurnParticipant != null &&
-              myParticipant != null &&
-              currentTurnParticipant.id == myParticipant.id;
+              !isMultiDevice ||
+              (currentTurnParticipant != null &&
+                  myParticipant != null &&
+                  currentTurnParticipant.id == myParticipant.id);
 
           return Column(
             children: [

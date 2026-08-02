@@ -36,6 +36,7 @@ class Participant {
     required this.turnPosition,
     required this.score,
     required this.currentTurn,
+    required this.joinedViaCode,
     required this.powerCards,
   });
 
@@ -48,6 +49,7 @@ class Participant {
       turnPosition: json['turnPosition'] as int,
       score: json['score'] as int,
       currentTurn: json['currentTurn'] as bool,
+      joinedViaCode: json['joinedViaCode'] as bool,
       powerCards: (json['powerCards'] as List<dynamic>)
           .map((e) => PowerCardAssignment.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -61,6 +63,11 @@ class Participant {
   final int turnPosition;
   final int score;
   final bool currentTurn;
+
+  /// True only for a player who entered the session code themselves on their
+  /// own login (real multi-device play), as opposed to being added via the
+  /// "same phone" quick-add flow. See [SessionState.isMultiDevice].
+  final bool joinedViaCode;
   final List<PowerCardAssignment> powerCards;
 }
 
@@ -166,6 +173,11 @@ class SessionState {
   final String? pausedAt;
   final String? completedAt;
   final int version;
+
+  /// True only when at least one participant actually joined by entering the
+  /// session code on their own login — i.e. this is genuinely being played
+  /// across separate devices, not one phone passed around the table.
+  bool get isMultiDevice => participants.any((p) => p.joinedViaCode);
 }
 
 class SessionSummary {

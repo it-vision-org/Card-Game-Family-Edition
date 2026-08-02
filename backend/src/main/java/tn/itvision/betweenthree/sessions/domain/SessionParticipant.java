@@ -47,6 +47,16 @@ public class SessionParticipant {
     @Column(name = "joined_at", nullable = false, updatable = false)
     private Instant joinedAt;
 
+    /**
+     * True only when this player entered the session code themselves, on
+     * their own login — i.e. real multi-device play. False for the session
+     * creator and for anyone added via the "same phone" quick-add flow.
+     * {@code SessionService.isMultiDevice} checks whether any participant
+     * has this set.
+     */
+    @Column(name = "joined_via_code", nullable = false)
+    private boolean joinedViaCode;
+
     public SessionParticipant(GameSession session, AppUser user, int turnPosition) {
         this.session = session;
         this.user = user;

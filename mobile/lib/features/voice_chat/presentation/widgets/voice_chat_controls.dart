@@ -8,13 +8,41 @@ import '../controllers/voice_controller.dart';
 /// screens pass the same [sessionId], so they share the same underlying
 /// [voiceControllerProvider] instance (and thus the same LiveKit room
 /// connection) via Riverpod's family caching.
+///
+/// [enabled] should be `session.isMultiDevice` — when `false` (everyone
+/// playing on one shared phone), this never touches
+/// [voiceControllerProvider] at all, so there's no connection attempt and no
+/// loading spinner: just two static, inert icons.
 class VoiceChatControls extends ConsumerWidget {
-  const VoiceChatControls({required this.sessionId, super.key});
+  const VoiceChatControls({
+    required this.sessionId,
+    required this.enabled,
+    super.key,
+  });
 
   final String sessionId;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (!enabled) {
+      return const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: 'المكالمة الصوتية متوفرة بين أجهزة متعددة فقط',
+            icon: Icon(Icons.volume_off),
+            onPressed: null,
+          ),
+          IconButton(
+            tooltip: 'المكالمة الصوتية متوفرة بين أجهزة متعددة فقط',
+            icon: Icon(Icons.mic_off),
+            onPressed: null,
+          ),
+        ],
+      );
+    }
+
     final voiceAsync = ref.watch(voiceControllerProvider(sessionId));
     final controller = ref.read(voiceControllerProvider(sessionId).notifier);
 

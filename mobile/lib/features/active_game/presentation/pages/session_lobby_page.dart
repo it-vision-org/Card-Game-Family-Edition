@@ -38,7 +38,12 @@ class _SessionLobbyPageState extends ConsumerState<SessionLobbyPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('غرفة الانتظار'),
-        actions: [VoiceChatControls(sessionId: widget.sessionId)],
+        actions: [
+          VoiceChatControls(
+            sessionId: widget.sessionId,
+            enabled: sessionAsync.value?.isMultiDevice ?? false,
+          ),
+        ],
       ),
       body: sessionAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
