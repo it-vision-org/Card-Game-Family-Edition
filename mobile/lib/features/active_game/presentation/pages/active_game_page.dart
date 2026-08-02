@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/network/api_exception.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../voice_chat/presentation/widgets/voice_chat_controls.dart';
 import '../../data/models/session_state.dart';
 import '../controllers/session_controller.dart';
 import '../widgets/card_timer.dart';
@@ -76,6 +77,7 @@ class ActiveGamePage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('الجلسة جارية'),
         actions: [
+          VoiceChatControls(sessionId: sessionId),
           if (sessionAsync.value?.scoringEnabled == true)
             IconButton(
               tooltip: 'منح نقطة',

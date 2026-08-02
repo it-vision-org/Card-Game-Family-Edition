@@ -47,6 +47,12 @@ app:
     access-token-secret: ${JWT_ACCESS_SECRET:local-access-secret-change-me}
     refresh-token-secret: ${JWT_REFRESH_SECRET:local-refresh-secret-change-me}
 
+  livekit:
+    api-key: ${LIVEKIT_API_KEY:}
+    api-secret: ${LIVEKIT_API_SECRET:}
+    ws-url: ${LIVEKIT_URL:}
+    token-expiration: PT6H
+
   seed:
     enabled: ${APP_SEED_ENABLED:true}
     players:
